@@ -21,9 +21,17 @@ package com.esotericsoftware.kryo.util;
 
 import static com.esotericsoftware.minlog.Log.*;
 
+import java.util.function.Function;
+
 /** A few utility methods, mostly for private use.
  * @author Nathan Sweet <misc@n4te.com> */
 public class Util {
+
+	
+	// registration Name
+	public static Function<String, String> saveRegistrationInterceptor;
+	public static Function<String, String> readRegistrationInterceptor;
+	
 	static public boolean isAndroid;
 	static {
 		try {
@@ -132,6 +140,26 @@ public class Util {
 			return type.getSimpleName();
 		}
 		return type.getName();
+	}
+ 
+	public static String interceptWritingRegisteredClassName (String className) {
+		if (saveRegistrationInterceptor != null) {
+			String converted = saveRegistrationInterceptor.apply(className);
+			if (TRACE) trace("kryo saving VerUp Naming " +className + " to :" + converted);
+			return converted;
+		} else {
+			return className;
+		}
+	}
+	
+	public static String interceptReadingRegisteredClassName (String className) {
+		if (readRegistrationInterceptor != null) {
+			String converted = readRegistrationInterceptor.apply(className);
+			if (TRACE) trace("kryo read VerUp Naming " +className + " as :" + converted);
+			return converted;
+		} else {
+			return className;
+		}
 	}
 
 	/** Returns the number of dimensions of an array. */

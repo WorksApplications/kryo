@@ -120,7 +120,7 @@ public class DefaultClassResolver implements ClassResolver {
 		if (classToNameId == null) classToNameId = new IdentityObjectIntMap();
 		classToNameId.put(type, nameId);
 		output.writeVarInt(nameId, true);
-		output.writeString(type.getName());
+		output.writeString(Util.interceptWritingRegisteredClassName(type.getName()));
 	}
 
 	public Registration readClass (Input input) {
@@ -147,7 +147,7 @@ public class DefaultClassResolver implements ClassResolver {
 		Class type = nameIdToClass.get(nameId);
 		if (type == null) {
 			// Only read the class name the first time encountered in object graph.
-			String className = input.readString();
+			String className = Util.interceptReadingRegisteredClassName(input.readString());
 			type = getTypeByName(className);
 			if (type == null) {
 				try {
